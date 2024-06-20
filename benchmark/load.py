@@ -1,10 +1,10 @@
-import aiohttp
 import argparse
 import asyncio
 import os
 import time
 
 from transformers import AutoTokenizer
+from baseten_client import BasetenAsyncClient
 
 
 BASETEN_API_KEY_ENV_VAR = "BASETEN_API_KEY"
@@ -17,35 +17,14 @@ async def make_request(client, data):
 
 
 async def consume(async_iter):
-    async for item in async_iter:
-        pass
-
-
-class BasetenAsyncClient:
-  def __init__(self, base_url, api_key, timeout=120):
-    self.base_url = base_url
-    self.api_key = api_key
-    self.timeout = timeout
-    self.session = None
-
-  async def __aenter__(self):
-    self.session = aiohttp.ClientSession(
-      headers={
-        "Authorization": f"Api-Key {self.api_key}",
-        "Content-Type": "application/json"
-      }
-    )
-    return self
-
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    await self.session.close()
-
-  async def predict(self, model_input):
-    url = f"{self.base_url}/production/predict"
-    async with self.session.post(url, json=model_input, timeout=self.timeout) as response:
-      response.raise_for_status()  # Raise an exception for HTTP errors
-      async for chunk in response.content.iter_any():
-        yield chunk.decode('utf-8')
+  cnt = 0
+  start_time = time.time()
+  ttft = None
+  async for _ in async_iter:
+    if cnt == 0:
+      ttft = time.time() - start_time
+    cnt +=1
+  return cnt, ttft
 
 
 def parse_args():
@@ -81,46 +60,78 @@ def parse_args():
       default=1000,
       help="Specify the output length"
   )
+  parser.add_argument(
+      "--num_runs",
+      type=int,
+      default=2,
+      help="number of runs"
+  )
 
   return parser.parse_args()
 
-async def main():
+async def run(model_base_url, input_len, output_len, concurrency, tokenizer):
+  """
+  Do a benchmark run.
 
-  args = parse_args()
-  print(args)
-  tokenizer = AutoTokenizer.from_pretrained(args.hf_tokenizer)
+  Sends requests in parallel and calculates various metrics such as time taken.
 
-  # todo: 
-  # 1. do multiple runs and average
-  # 2. calc ttft
-  # 3. calc output tps
+  Note that ttft here is worse that it would normally be. All requests are
+  started at the same time, so all requests content on the context phase. In
+  real world requests won't start at the same time. This can be fixed by adding
+  a jitter to the start time of each request. But that's not implemented here to
+  keep this code simple.
+  """
   async with BasetenAsyncClient(
-    base_url=args.model_base_url, # todo, remove mc-dev
+    url=model_base_url, # todo, remove mc-dev
     api_key=os.environ.get(BASETEN_API_KEY_ENV_VAR)
   ) as client:
 
     # Generate sample data
-    input_ids = [i for i in range(args.input_len)]
+    input_ids = [i for i in range(input_len)]
     sample_data = [
       {
         "prompt": tokenizer.decode(input_ids),
-        "max_tokens": args.output_len,
+        "max_tokens": output_len,
       }
-      for _ in range(args.concurrency)
+      for i in range(concurrency)
     ]
 
     start_time = time.time()
 
     # Make concurrent requests
     tasks = [consume(make_request(client, data)) for data in sample_data]
-    results = await asyncio.gather(*tasks)
+    counts = await asyncio.gather(*tasks)
+    total_output_tokens = sum([count[0] for count in counts])
+    ttft = sum([count[1] for count in counts]) / len(counts)
+    # print(counts)
 
-  end_time = time.time()
+    end_time = time.time()
 
-  # Calculate total time taken
-  total_time = end_time - start_time
-  print("Total time taken:", total_time, "seconds")
-  print("Tps:", (args.concurrency * args.output_len) / total_time)
+    # Calculate total time taken
+    total_time = end_time - start_time
+    print("\tTotal time taken:", total_time, "seconds")
+    print("\tOutput Tps:", (total_output_tokens / total_time))
+    print("\tTotal Tps:", (concurrency * input_len + total_output_tokens) / total_time)
+    print("\tTTFT:", ttft * 1000, "ms")
+
+async def main():
+
+  args = parse_args()
+  print(args)
+  tokenizer = AutoTokenizer.from_pretrained(args.hf_tokenizer)
+  print("Warmup run:")
+  await run(args.model_base_url, 1, 1, 10, tokenizer)
+
+  print("\nBenchmark runs:")
+  for i in range(args.num_runs):
+    print(f"Run {i+1}:")
+    await run(
+      args.model_base_url,
+      args.input_len,
+      args.output_len,
+      args.concurrency,
+      tokenizer,
+    )
 
 
 if __name__ == "__main__":
