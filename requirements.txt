@@ -1,1 +1,4 @@
 truss
+transformers
+hf_transfer
+aiohttp
