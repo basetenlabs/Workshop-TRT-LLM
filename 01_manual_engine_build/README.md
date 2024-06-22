@@ -1,14 +1,45 @@
-# Build TensortRT-LLM engine 
+# Build TensorRT-LLM engine 
 
-## Spin up a machine on Runpod
+Building a TensorRT-LLM engine requires a GPU. For this step, we'll use RTX 4090s on RunPod.
 
-- Use RTX-4090 
-- `runpod/pytorch:2.2.0-py3.10-cuda12.1.1-devel-ubuntu22.04` image
-- 1 GPU is sufficient for this exercise
-  - 2 GPUs if you want to try TensorParallelism
-- Increase container disk to 200 GB in the template, we need more space
-- Feel free to use spot to save cost
-- ssh into the machine
+The fastest way to get everyone their own GPU is for you to sign up for your own account on RunPod. There's a ten dollar minimum credit buy on RunPod — if you're unable to expense this, let Philip know and he can reimburse the ten dollars after the workshop.
+
+If you're unable to access RunPod for any reason, let Philip know and as a fallback he will spin up a GPU for you and get you web console access.
+
+## Set up RunPod
+
+1. [Sign up for an account](https://www.runpod.io/console/signup).
+2. Purchase 10 dollars of credits (minimum purchase, completing the workshop will cost far less)
+3. Create a public SSH key and paste it under SSH Public Keys in your [Account Settings](https://www.runpod.io/console/user/settings).
+
+To create your keypair, open terminal and run:
+
+```
+ssh-keygen -t ed25519
+```
+
+When asked for a path, create a new key at `.ssh/runpod`
+
+To get the public key, run:
+
+```
+cat .ssh/runpod.pub
+```
+
+Paste the entire value into the SSH Public Keys field in your [Account Settings](https://www.runpod.io/console/user/settings).
+
+## Spin up a 4090
+
+Let's get a GPU!
+
+- Go to the Pods page and click [Deploy](https://www.runpod.io/console/deploy).
+- Select RTX 4090 from the list
+- Stick with 1 GPU, unless you want to try Tensor Parallelism, in which case you should set it to 2 GPUs
+- Use the "Change Template" button to set the template to `runpod/pytorch:2.2.0-py3.10-cuda12.1.1-devel-ubuntu22.04`
+- Use the "Edit Template" to increase the container disk to 200 GB to make space for installing dependencies
+- Deploy!
+
+Once the Pod is deployed, SSH into it locally or use the web console to access a shell through your browser.
 
 ## Verify that machine is set up well
 
@@ -19,6 +50,28 @@ nvidia-smi
 You should see a box with 1 GPU with 24 GB of memory. You will also see cuda,
 driver version and other things. If `nvidia-smi` doesn't work for some reason
 then something is wrong and you should spin up the machine fresh.
+
+```
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 545.23.08              Driver Version: 545.23.08    CUDA Version: 12.3     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA GeForce RTX 4090        On  | 00000000:C1:00.0 Off |                  Off |
+|  0%   27C    P8              11W / 450W |      3MiB / 24564MiB |      0%      Default |
+|                                         |                      |                  N/A |
++-----------------------------------------+----------------------+----------------------+
+
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+```
 
 ## Install TensorRT-LLM
 
