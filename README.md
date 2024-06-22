@@ -1,13 +1,17 @@
-# TensorRT-LLM Workshop
+# AI Engineer World's Fair TensorRT-LLM Workshop
 
-## Deploy truss
+Welcome to *From model weights to API endpoint with TensorRT-LLM* presented at The AI Engineer World's Fair!
 
-```sh
-pip install truss
-truss push ./tiny-llama-truss --publish --trusted
-```
+We're your hosts, Pankaj Gupta and Philip Kiely from [Baseten](https://www.baseten.co), and we're thrilled to have you here today.
 
-or via make
-```sh
-make deploy_tiny_llama_on_baseten
-```
+This workshop has three live coding components, which correspond to numbered folders:
+
+1. Building a TensorRT engine manually with TensorRT-LLM
+2. Building an engine automatically on deployment with Truss
+3. Benchmarking deployed models
+
+Specific instructions for each component are in the respective folders' READMEs.
+
+Let's get some TPS!
+
+— Pankaj and Philip

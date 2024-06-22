@@ -16,10 +16,10 @@ clean:
 	rm -rf $(VENV_DIR)
 
 deploy_tiny_llama_on_baseten: install
-	$(VENV_DIR)/bin/truss push ./tiny-llama-truss --publish --trusted
+	$(VENV_DIR)/bin/truss push ./02_truss_engine_build/tiny-llama-truss --publish --trusted
 
 benchmark:
-	$(VENV_DIR)/bin/python3 benchmark/load.py \
+	$(VENV_DIR)/bin/python3 03_benchmark/load.py \
 	  --model_base_url $(MODEL_BASE_URL) \
 		--input_len $(INPUT_LEN) \
 		--output_len $(OUTPUT_LEN) \
