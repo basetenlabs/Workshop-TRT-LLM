@@ -111,7 +111,7 @@ cd examples/llama
 
 ## Build Engine
 
-Enable hf_transfer for faster download.
+Enable `hf_transfer` for faster download.
 
 ```sh
 export HF_HUB_ENABLE_HF_TRANSFER=true
@@ -129,15 +129,15 @@ python3 convert_checkpoint.py --model_dir ./tllama/ \
 
 # Build Engine
 trtllm-build --checkpoint_dir ./tllm_checkpoint_1gpu_fp16 \
-            --output_dir ./trt_engines/tllama/fp16/1-gpu \
-            --gemm_plugin auto
+             --output_dir ./trt_engines/tllama/fp16/1-gpu \
+             --gemm_plugin auto
 
 # Check the size of engine created
 du -h -d 1 ./trt_engines/tllama/fp16/1-gpu
 
 python3 ../run.py --max_output_len=50 \
-               --tokenizer_dir ./tllama/ \
-               --engine_dir=./trt_engines/tllama/fp16/1-gpu
+                  --tokenizer_dir ./tllama/ \
+                  --engine_dir=./trt_engines/tllama/fp16/1-gpu
 ```
 
 ## Try FP8
@@ -148,11 +148,11 @@ python3 ../run.py --max_output_len=50 \
 ```sh
 # Quantize HF tinyllama into FP8 and export trtllm checkpoint
 python3 ../quantization/quantize.py --model_dir ./tllama \
-                                   --dtype float16 \
-                                   --qformat fp8 \
-                                   --kv_cache_dtype fp8 \
-                                   --output_dir ./tllm_checkpoint_1gpu_fp8 \
-                                   --calib_size 36
+                                    --dtype float16 \
+                                    --qformat fp8 \
+                                    --kv_cache_dtype fp8 \
+                                    --output_dir ./tllm_checkpoint_1gpu_fp8 \
+                                    --calib_size 36
 
 # Build trtllm engines from the trtllm checkpoint
 trtllm-build --checkpoint_dir ./tllm_checkpoint_1gpu_fp8 \
@@ -163,6 +163,6 @@ trtllm-build --checkpoint_dir ./tllm_checkpoint_1gpu_fp8 \
 du -h -d 1 ./trt_engines/tllama/fp8/1-gpu
 
 python3 ../run.py --max_output_len=50 \
-               --tokenizer_dir ./tllama/ \
-               --engine_dir=./trt_engines/tllama/fp8/1-gpu
+                  --tokenizer_dir ./tllama/ \
+                  --engine_dir=./trt_engines/tllama/fp8/1-gpu
 ```
