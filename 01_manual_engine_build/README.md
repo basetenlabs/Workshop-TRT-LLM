@@ -30,6 +30,8 @@ Paste the entire value into the SSH Public Keys field in your [Account Settings]
 
 ## Spin up a 4090
 
+https://github.com/basetenlabs/Workshop-TRT-LLM/assets/98474633/66f4958d-c9d2-4199-8bfb-dc20f761ea52
+
 Let's get a GPU!
 
 - Go to the Pods page and click [Deploy](https://www.runpod.io/console/deploy).
