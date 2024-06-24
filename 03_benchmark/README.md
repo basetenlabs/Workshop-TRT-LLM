@@ -1,4 +1,15 @@
-# Benchmarking
+# Benchmark your TensorRT-LLM engine
+
+Let's see how much performance we've unlocked.
+
+
+## Getting set up
+
+Watch a 1-minute video walkthrough (p.s. I already revoked the API key, don't try any funny business):
+
+
+
+Here are the steps to get set up to run the script:
 
 1. Make sure the model is deployed and running and that concurrency target is more than max
    concurrency you want to try,
@@ -11,18 +22,22 @@
       `https://model-<model_version_id>.api,baseten.co/production/predict`
 3. Log into Baseten, generate and api key and copy it
 4. export BASETEN_API_KEY=<your api key>
-5. Run benchmark `make benchmark MODEL_BASE_URL=<model_predict_url_from_above> CONCURRENCY=32 OUTPUT_LEN=1000 INPUT_LEN=1000`
 
-Feel free to modify various settings such as INPUT_LEN, OUTPUT_LEN and
-CONCURRENCY to see how it impacts ttft and tps.
+## Running the benchmark script
 
-Please note that concurrency 1 and concurrency == max_batch_size are special
-cases and worth trying.
+```sh
+make benchmark MODEL_BASE_URL=<model_predict_url_from_above> CONCURRENCY=32 OUTPUT_LEN=1000 INPUT_LEN=1000
+```
 
-1. Concurrency 1 provides best ttft and perceived tps (per request served tps)
-2. Concurrency == max_batch_size provides max tps
+Feel free to modify various settings such as `INPUT_LEN`, `OUTPUT_LEN` and
+`CONCURRENCY` to see how it impacts TTFT and TPS.
 
-## Exercise
+Special cases worth trying:
+
+1. `Concurrency == 1` provides best TTFT and perceived TPS (per request served)
+2. `Concurrency == max_batch_size` provides the best TPS
+
+## Benchmarking different configurations
 
 See how far you can increase throughput by doing the following:
 
@@ -33,6 +48,6 @@ See how far you can increase throughput by doing the following:
 
 ## Modifying the benchmarking script
 
-The [benchmarking script](03_benchmark/load.py) is a simple python script on
+The [benchmarking script](/03_benchmark/load.py) is a simple python script on
 purpose. Feel free to study it and modify it. e.g. Instead of getting metrics
 per run, try to average them over runs.
