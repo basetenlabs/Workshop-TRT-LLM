@@ -57,3 +57,32 @@ make deploy_tiny_llama_on_baseten
 ```
 
 While the engine build and model deployment run, head over to your Baseten workspace to see logs.
+
+## Call the model
+
+Try the model in the "Call model" dialog with a basic query:
+
+```json
+{ "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "What are the most famous places in Paris?"}], "max_tokens": 512}
+```
+
+Or call it via its API endpoint:
+
+```python
+import requests
+
+model_id = ""
+
+resp = requests.post(
+    f"https://model-{model_id}.api.baseten.co/production/predict",
+    headers={"Authorization": "Api-Key YOUR_API_KEY"},
+    json={
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "What are the most famous places in Paris?"}],
+        "max_tokens": 512
+    },
+)
+
+print(resp.json())
+```
