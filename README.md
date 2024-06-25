@@ -1,5 +1,7 @@
 # AI Engineer World's Fair TensorRT-LLM Workshop
 
+[View Slides](https://docs.google.com/presentation/d/1M0n3RfeaDzwXJ3jFJSTFUcZb71jeLax-IGOgRfKRUWs/edit?usp=sharing)
+
 Welcome to *From model weights to API endpoint with TensorRT-LLM* presented at The AI Engineer World's Fair!
 
 We're your hosts, Pankaj Gupta and Philip Kiely from [Baseten](https://www.baseten.co), and we're thrilled to have you here today.
