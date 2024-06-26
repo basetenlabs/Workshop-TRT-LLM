@@ -16,6 +16,9 @@ clean:
 	rm -rf $(VENV_DIR)
 
 deploy_tiny_llama_on_baseten: install
+	# Hack to disable caching, so full model build flow is exercised for inspection
+	$(VENV_DIR)/bin/python ./02_truss_engine_build/add_random_metadata.py ./02_truss_engine_build/tiny-llama-truss/config.yaml
+
 	$(VENV_DIR)/bin/truss push ./02_truss_engine_build/tiny-llama-truss --publish --trusted
 
 benchmark:
