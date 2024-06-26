@@ -142,10 +142,7 @@ python3 ../run.py --max_output_len=50 \
                   --engine_dir=./trt_engines/tllama/fp16/1-gpu
 ```
 
-## Try FP8
-
-```sh
-## fp8
+## FP8
 
 ```sh
 # Quantize HF tinyllama into FP8 and export trtllm checkpoint
